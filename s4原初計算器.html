@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S4原初計算器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        .label-example {
+            font-weight: normal;
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 2px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .total-score {
+            background: #f0f0f0;
+            color: #333;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 30px;
+        }
+        .output {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            label {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>s4原初計算器</h1>
+        
+        <div class="input-group">
+            <label for="level">
+                角色等級
+                <div class="label-example">（e.g. 282級，經驗有一半填282.5）</div>
+            </label>
+            <input type="number" id="level" min="0" step="0.1" value="0" oninput="calculate()">
+        </div>
+        
+        <div class="input-group">
+            <label for="equipment">
+                裝備等級
+                <div class="label-example">（把所有裝備等級加起來/5）</div>
+            </label>
+            <input type="number" id="equipment" min="0" step="0.1" value="0" oninput="calculate()">
+        </div>
+        
+        <div class="input-group">
+            <label for="skill">
+                技能等級
+                <div class="label-example">（把所有技能等級加起來/8）</div>
+            </label>
+            <input type="number" id="skill" min="0" step="0.1" value="0" oninput="calculate()">
+        </div>
+        
+        <div class="input-group">
+            <label for="phantom">
+                幻獸等級
+                <div class="label-example">（把所有幻獸等級加起來/4）</div>
+            </label>
+            <input type="number" id="phantom" min="0" step="0.1" value="0" oninput="calculate()">
+        </div>
+        
+        <div class="input-group">
+            <label for="artifact">
+                古遺物
+                <div class="label-example">（把所有古遺物等級加起來/20）</div>
+            </label>
+            <input type="number" id="artifact" min="0" step="0.1" value="0" oninput="calculate()">
+        </div>
+        
+        <div class="input-group">
+            <label for="existing">已有原初</label>
+            <input type="number" id="existing" min="0" step="0.1" value="0" oninput="calculate()">
+        </div>
+        
+        <div class="total-score" id="totalScore">
+            總分：0
+        </div>
+        
+        <div class="output" id="output">
+            s4原初：0
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const level = parseFloat(document.getElementById('level').value) || 0;
+            const equipment = parseFloat(document.getElementById('equipment').value) || 0;
+            const skill = parseFloat(document.getElementById('skill').value) || 0;
+            const phantom = parseFloat(document.getElementById('phantom').value) || 0;
+            const artifact = parseFloat(document.getElementById('artifact').value) || 0;
+            const existing = parseFloat(document.getElementById('existing').value) || 0;
+            
+            // 計算每個屬性的加成（190以下算0分）
+            const levelBonus = level > 190 ? (level - 190) * 100 : 0;
+            const equipmentBonus = equipment > 190 ? (equipment - 190) * 85 : 0;
+            const skillBonus = skill > 190 ? (skill - 190) * 40 : 0;
+            const phantomBonus = phantom > 190 ? (phantom - 190) * 44 : 0;
+            const artifactBonus = artifact > 19 ? (artifact - 19) * 560 : 0;
+            
+            // 計算總分（不包含已有原初）
+            const totalScore = levelBonus + equipmentBonus + skillBonus + phantomBonus + artifactBonus;
+            
+            // 計算 s4原初：120 + 已有原初 + (總分 / 13) 向下取整
+            const s4Original = 120 + existing + Math.floor(totalScore / 7);
+            
+            document.getElementById('totalScore').textContent = `總分：${totalScore.toFixed(1)}`;
+            document.getElementById('output').textContent = `s4原初：${s4Original}`;
+        }
+        
+        // 初始計算
+        calculate();
+    </script>
+</body>
+</html>
